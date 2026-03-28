@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Alert, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import ImageViewer from 'react-native-image-zoom-viewer';
 
@@ -15,7 +15,7 @@ export default function App() {
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1, // Keeps the original high-res quality
+      quality: 1, 
     });
 
     if (!result.canceled) {
@@ -40,12 +40,25 @@ export default function App() {
             saveToLocalByLongPress={false}
             enableSwipeDown={false}
             
-            // --- THE ZOOM OVERDRIVE SETTINGS ---
-            maxScale={100}           // Allows 100x magnification
+            // --- SHARPNESS & SPEED OVERDRIVE ---
+            maxScale={200}              // Extreme zoom limit
             doubleClickConfigs={{
-              zoomFactor: 10,        // Double tap jumps to 10x instantly
+              zoomFactor: 20,           // Massive jump on double tap
+              doubleClickInterval: 250, // Snappier response
             }}
+            pageAnimateTime={100}       // Reduces "lags" during zoom transitions
             enableDoubleClickZoom={true}
+            
+            // This forces Android to keep the pixels blocky
+            renderImage={(props) => (
+              <Image 
+                {...props} 
+                style={[props.style, { 
+                    interpolationMode: 'none', // The "Magic" sharpness setting
+                    renderToHardwareTextureAndroid: true 
+                }]} 
+              />
+            )}
             // ----------------------------------
           />
         ) : (
