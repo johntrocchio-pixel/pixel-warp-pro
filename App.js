@@ -15,7 +15,7 @@ export default function App() {
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
+      quality: 1, // Keeps the original high-res quality
     });
 
     if (!result.canceled) {
@@ -39,7 +39,14 @@ export default function App() {
             backgroundColor="#000"
             saveToLocalByLongPress={false}
             enableSwipeDown={false}
-            failImageSource={{ url: 'https://via.placeholder.com/400' }}
+            
+            // --- THE ZOOM OVERDRIVE SETTINGS ---
+            maxScale={100}           // Allows 100x magnification
+            doubleClickConfigs={{
+              zoomFactor: 10,        // Double tap jumps to 10x instantly
+            }}
+            enableDoubleClickZoom={true}
+            // ----------------------------------
           />
         ) : (
           <TouchableOpacity style={styles.placeholder} onPress={pickImage}>
