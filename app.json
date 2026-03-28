@@ -8,7 +8,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#1a1a1a"
     },
@@ -17,11 +17,11 @@
       "bundleIdentifier": "com.johntro.pixelwarppro"
     },
     "android": {
+      "package": "com.johntro.pixelwarppro",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#1a1a1a"
-      },
-      "package": "com.johntro.pixelwarppro"
+      }
     },
     "extra": {
       "eas": {
