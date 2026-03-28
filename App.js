@@ -1,16 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Dimensions, Alert, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { 
-  Canvas, Image, useImage, Skia, Group, RuntimeShader, Path, Fill
+  Canvas, Image, useImage, Skia, Group, RuntimeShader, Path
 } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, withTiming, useDerivedValue } from 'react-native-reanimated';
+import Animated, { useSharedValue, withTiming } from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// --- GPU LIQUIFY SHADER ---
-const LIQUIFY_SHADER = Skia.RuntimeEffect.Make(`
+// --- PICSAY DISTORT SHADER (GPU Accelerated) ---
+const DISTORT_SHADER = Skia.RuntimeEffect.Make(`
   uniform shader image;
   uniform vec2 fingerPos;
   uniform float radius;
@@ -30,11 +30,11 @@ export default function App() {
   const [imageUri, setImageUri] = useState(null);
   const skiaImage = useImage(imageUri);
   
-  // MODES: 0=Navigate, 1=Distort (Liquify), 2=Mask/Paint, 3=Batch/Filter
+  // MODES: 0=Nav, 1=Distort, 2=Mask, 3=Batch
   const [mode, setMode] = useState(0); 
   const [maskPaths, setMaskPaths] = useState([]);
 
-  // --- TRANSFORMATION STATE ---
+  // --- TRANSFORMATION STATE (1000x Zoom Capable) ---
   const scale = useSharedValue(1);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
@@ -51,24 +51,22 @@ export default function App() {
     if (!result.canceled) setImageUri(result.assets[0].uri);
   };
 
-  // --- GESTURES: TOGGLE & ZOOM ---
+  // --- PICSAY GESTURE LOGIC ---
   const doubleTap = Gesture.Tap().numberOfTaps(2).onStart(() => {
     if (scale.value > 1) {
       scale.value = withTiming(1);
       translateX.value = withTiming(0);
       translateY.value = withTiming(0);
     } else {
-      scale.value = withTiming(500); // 500x Jump
+      scale.value = withTiming(500); // 500x Jump to Pixels
     }
   });
 
-  // --- GESTURES: LIQUIFY/DISTORT ---
   const distortGesture = Gesture.Pan().enabled(mode === 1).onUpdate((e) => {
     fingerPos.value = { x: e.x, y: e.y };
     warpStrength.value = 0.8;
   }).onEnd(() => { warpStrength.value = 0; });
 
-  // --- GESTURES: MASK PAINTING ---
   const paintGesture = Gesture.Pan().enabled(mode === 2).onStart((e) => {
     const p = Skia.Path.Make();
     p.moveTo(e.x, e.y);
@@ -100,6 +98,7 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
         
+        {/* TOP BAR: PICSAY HEADER */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>PIXEL WARP PRO</Text>
           <TouchableOpacity onPress={pickImage} style={styles.getBtn}>
@@ -117,33 +116,32 @@ export default function App() {
                     x={0} y={0}
                     width={SCREEN_WIDTH} height={SCREEN_HEIGHT}
                     fit="contain"
-                    sampling={{ filter: 'nearest' }}
+                    sampling={{ filter: 'nearest' }} // ZERO BLUR MODE
                   >
                     {mode === 1 && (
                       <RuntimeShader 
-                        source={LIQUIFY_SHADER} 
+                        source={DISTORT_SHADER} 
                         uniforms={{ fingerPos, radius: 120, strength: warpStrength }} 
                       />
                     )}
                   </Image>
                 )}
                 
-                {/* MASK LAYER (PICSAY SELECTION STYLE) */}
+                {/* MASKING LAYER */}
                 {maskPaths.map((path, i) => (
-                  <Path key={i} path={path} color="rgba(0, 255, 204, 0.4)" style="stroke" strokeWidth={10} />
+                  <Path key={i} path={path} color="rgba(0, 255, 204, 0.3)" style="stroke" strokeWidth={12} strokeCap="round" />
                 ))}
               </Group>
             </Canvas>
           </View>
         </GestureDetector>
 
-        {/* BATCH / FILTER PRESETS OVERLAY */}
+        {/* BATCH FILTER DRAWER */}
         {mode === 3 && (
           <View style={styles.batchOverlay}>
-             <Text style={styles.overlayTitle}>BATCH PRESETS</Text>
              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {['VIBRANT', 'SHARPEN', 'TK-TOK', 'WARM', 'COLD'].map((f) => (
-                  <TouchableOpacity key={f} style={styles.filterCard} onPress={() => Alert.alert("Batch", `Applying ${f} to folder...`)}>
+                {['SHARPEN', 'VIBRANT', 'TK-TOK', 'WARM', 'COLD', 'MASK-ALL'].map((f) => (
+                  <TouchableOpacity key={f} style={styles.filterCard} onPress={() => Alert.alert("Batch Apply", `Processing ${f}...`)}>
                     <Text style={styles.filterText}>{f}</Text>
                   </TouchableOpacity>
                 ))}
@@ -151,13 +149,13 @@ export default function App() {
           </View>
         )}
 
-        {/* PICSAY NAVIGATION BAR */}
+        {/* BOTTOM NAVIGATION: PICSAY STYLE */}
         <View style={styles.toolbar}>
-          <Tool label="NAV" active={mode === 0} onPress={() => setMode(0)} />
+          <Tool label="VIEW" active={mode === 0} onPress={() => setMode(0)} />
           <Tool label="DISTORT" active={mode === 1} onPress={() => setMode(1)} />
           <Tool label="MASK" active={mode === 2} onPress={() => setMode(2)} />
           <Tool label="BATCH" active={mode === 3} onPress={() => setMode(3)} />
-          <TouchableOpacity style={styles.exportBtn} onPress={() => Alert.alert("Export", "Saving full res...")}>
+          <TouchableOpacity style={styles.exportBtn} onPress={() => Alert.alert("Export", "Saving at Full Quality...")}>
             <Text style={styles.exportText}>DONE</Text>
           </TouchableOpacity>
         </View>
@@ -176,19 +174,18 @@ const Tool = ({ label, active, onPress }) => (
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   header: { height: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 15, backgroundColor: '#111', borderBottomWidth: 1, borderColor: '#333' },
-  headerTitle: { color: '#00ffcc', fontWeight: 'bold', fontSize: 12, letterSpacing: 3 },
-  getBtn: { backgroundColor: '#222', padding: 10, borderRadius: 4 },
+  headerTitle: { color: '#00ffcc', fontWeight: 'bold', fontSize: 11, letterSpacing: 4 },
+  getBtn: { backgroundColor: '#222', padding: 10, borderRadius: 2, borderWidth: 1, borderColor: '#444' },
   getBtnText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
   canvasContainer: { flex: 1 },
-  batchOverlay: { height: 120, backgroundColor: '#111', padding: 15 },
-  overlayTitle: { color: '#888', fontSize: 10, marginBottom: 10, fontWeight: 'bold' },
-  filterCard: { width: 80, height: 60, backgroundColor: '#222', justifyContent: 'center', alignItems: 'center', marginRight: 10, borderRadius: 4, borderWidth: 1, borderColor: '#444' },
-  filterText: { color: '#00ffcc', fontSize: 10, fontWeight: 'bold' },
-  toolbar: { height: 90, flexDirection: 'row', backgroundColor: '#111', alignItems: 'center', justifyContent: 'space-around', borderTopWidth: 1, borderColor: '#333' },
-  toolBtn: { alignItems: 'center', padding: 10 },
-  activeTool: { borderBottomWidth: 2, borderColor: '#00ffcc' },
-  toolText: { color: '#555', fontSize: 9, fontWeight: 'bold' },
+  batchOverlay: { height: 100, backgroundColor: '#111', padding: 10, borderTopWidth: 1, borderColor: '#333' },
+  filterCard: { width: 90, height: 60, backgroundColor: '#222', justifyContent: 'center', alignItems: 'center', marginRight: 10, borderRadius: 2, borderWidth: 1, borderColor: '#00ffcc' },
+  filterText: { color: '#00ffcc', fontSize: 9, fontWeight: 'bold' },
+  toolbar: { height: 90, flexDirection: 'row', backgroundColor: '#111', alignItems: 'center', justifyContent: 'space-around' },
+  toolBtn: { alignItems: 'center', padding: 15 },
+  activeTool: { borderBottomWidth: 3, borderColor: '#00ffcc' },
+  toolText: { color: '#666', fontSize: 9, fontWeight: 'bold' },
   activeToolText: { color: '#00ffcc' },
-  exportBtn: { backgroundColor: '#00ffcc', padding: 12, borderRadius: 4 },
-  exportText: { color: '#000', fontWeight: 'bold', fontSize: 10 }
+  exportBtn: { backgroundColor: '#00ffcc', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 2 },
+  exportText: { color: '#000', fontWeight: 'bold', fontSize: 11 }
 });
