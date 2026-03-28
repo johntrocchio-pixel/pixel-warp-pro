@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "pixel-warp-pro",
+    "name": "PixelWarpPro",
     "slug": "pixel-warp-pro",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,27 +9,34 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a1a1a"
+      "backgroundColor": "#000000"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.johntro.pixelwarppro"
+      "bundleIdentifier": "com.yourname.pixelwarppro"
     },
     "android": {
-      "package": "com.johntro.pixelwarppro",
-      "permissions": [
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "CAMERA"
-      ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#1a1a1a"
-      }
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.yourname.pixelwarppro",
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA"
+      ]
     },
+    "plugins": [
+      "@shopify/react-native-skia",
+      "expo-image-picker"
+    ],
     "extra": {
       "eas": {
-        "projectId": "69de1cb7-7b92-4d36-84e3-898f6bc1f9f5"
+        "projectId": "your-project-id"
       }
     }
   }
