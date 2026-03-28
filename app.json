@@ -2,6 +2,25 @@
   "expo": {
     "name": "pixel-warp-pro",
     "slug": "pixel-warp-pro",
+    "projectId": "69de1cb7-7b92-4d36-84e3-898f6bc1f9f5",
+    "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "69de1cb7-7b92-4d36-84e3-898f6bc1f9f5"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.johntro.pixelwarppro"
+    },
+    "android": {
+      "package": "com.johntro.pixelwarppro"
+    }
+  }
+}
+{
+  "expo": {
+    "name": "pixel-warp-pro",
+    "slug": "pixel-warp-pro",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
