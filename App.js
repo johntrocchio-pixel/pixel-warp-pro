@@ -28,7 +28,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>PIXEL MICROSCOPE PRO</Text>
+        <Text style={styles.title}>PIXEL MICROSCOPE SHARP</Text>
       </View>
 
       <View style={styles.canvas}>
@@ -37,30 +37,23 @@ export default function App() {
             imageUrls={images}
             renderIndicator={() => null} 
             backgroundColor="#000"
-            
-            // --- FIXING THE PINCH-TO-ZOOM ---
-            enablePinchZoom={true}       // Force enable the gesture
-            maxScale={500}               // Extreme zoom depth
+            enablePinchZoom={true}
+            maxScale={500} // Extreme depth
             minScale={1}
-            useNativeDriver={true}       // Uses hardware for smoother response
-            maxOverflow={0}              // Prevents the "sliding away" feel
-            
             doubleClickConfigs={{
-              zoomFactor: 20,           // Fast jump to pixels
+              zoomFactor: 25, // Jump deep into pixels on double tap
             }}
-            
-            // KEEPING IT SHARP (NO BLUR)
+            // THIS SECTION KILLS THE BLUR
             renderImage={(props) => (
               <Image 
                 {...props} 
                 style={[props.style, { 
-                    resizeMode: 'contain',
+                    // This is the specific Android fix for pixelated scaling
+                    renderToHardwareTextureAndroid: true,
                 }]} 
-                // Hardware-level sharpness for Android
-                textureConfig={{
-                  minFilter: 'nearest',
-                  magFilter: 'nearest',
-                }}
+                // Forces the OS to not smooth the image
+                resizeMethod="scale" 
+                fadeDuration={0}
               />
             )}
           />
@@ -73,7 +66,7 @@ export default function App() {
 
       <View style={styles.footer}>
         <TouchableOpacity style={styles.button} onPress={pickImage}>
-          <Text style={styles.buttonText}>{image ? "CHANGE IMAGE" : "OPEN GALLERY"}</Text>
+          <Text style={styles.buttonText}>{image ? "NEW IMAGE" : "OPEN GALLERY"}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -82,12 +75,24 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-  header: { paddingTop: 50, alignItems: 'center', backgroundColor: '#111', paddingBottom: 20 },
+  header: { 
+    paddingTop: 50, 
+    alignItems: 'center', 
+    backgroundColor: '#111', 
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderColor: '#00ffcc33' 
+  },
   title: { color: '#00ffcc', fontSize: 18, fontWeight: 'bold', letterSpacing: 4 },
   canvas: { flex: 1 },
   placeholder: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  placeholderText: { color: '#00ffcc', fontSize: 16, opacity: 0.6 },
-  footer: { backgroundColor: '#111', paddingBottom: 40, alignItems: 'center', paddingTop: 10 },
-  button: { backgroundColor: '#00ffcc', paddingVertical: 15, paddingHorizontal: 50, borderRadius: 5 },
-  buttonText: { color: '#000', fontWeight: 'bold' },
+  placeholderText: { color: '#00ffcc', fontSize: 14, opacity: 0.5 },
+  footer: { backgroundColor: '#111', paddingBottom: 40, alignItems: 'center', paddingTop: 15 },
+  button: { 
+    backgroundColor: '#00ffcc', 
+    paddingVertical: 15, 
+    paddingHorizontal: 50, 
+    borderRadius: 2 
+  },
+  buttonText: { color: '#000', fontWeight: 'bold', letterSpacing: 1 },
 });
