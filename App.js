@@ -15,7 +15,7 @@ export default function App() {
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1, // Crucial: Pulls the raw, uncompressed file
+      quality: 1, 
     });
 
     if (!result.canceled) {
@@ -28,7 +28,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>PIXEL INSPECTOR PRO</Text>
+        <Text style={styles.title}>PIXEL TOGGLE PRO</Text>
       </View>
 
       <View style={styles.canvas}>
@@ -38,35 +38,39 @@ export default function App() {
             renderIndicator={() => null} 
             backgroundColor="#000"
             enablePinchZoom={true}
-            maxScale={1000} // 1000x Zoom for deep manipulation inspection
+            maxScale={500} 
             minScale={1}
+            
+            // --- THE INSTANT TOGGLE CONFIG ---
+            enableDoubleClickZoom={true}
             doubleClickConfigs={{
-              zoomFactor: 50, // Instant jump to pixel-level on double-tap
+              zoomFactor: 500, // This forces it to the limit instantly
+              doubleClickInterval: 300, 
             }}
-            // --- THE PRECISION RENDERER ---
+            // ---------------------------------
+
             renderImage={(props) => (
               <Image 
                 {...props} 
                 style={[props.style, { 
-                    // This kills the blur on high-end Androids
                     interpolationMode: 'none',
                     renderToHardwareTextureAndroid: true,
                 }]} 
-                resizeMethod="scale" // Forces hard-edge scaling
+                resizeMethod="scale"
                 fadeDuration={0}
               />
             )}
           />
         ) : (
           <TouchableOpacity style={styles.placeholder} onPress={pickImage}>
-            <Text style={styles.placeholderText}>+ LOAD ARTWORK</Text>
+            <Text style={styles.placeholderText}>+ SELECT ARTWORK</Text>
           </TouchableOpacity>
         )}
       </View>
 
       <View style={styles.footer}>
         <TouchableOpacity style={styles.button} onPress={pickImage}>
-          <Text style={styles.buttonText}>{image ? "RELOAD IMAGE" : "OPEN GALLERY"}</Text>
+          <Text style={styles.buttonText}>{image ? "RELOAD" : "OPEN GALLERY"}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -92,7 +96,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00ffcc', 
     paddingVertical: 15, 
     paddingHorizontal: 60, 
-    borderRadius: 0 // Sharp corners for a technical look
+    borderRadius: 0 
   },
   buttonText: { color: '#000', fontWeight: 'bold', letterSpacing: 2 },
 });
