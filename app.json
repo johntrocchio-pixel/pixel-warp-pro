@@ -3,41 +3,15 @@
     "name": "PixelWarpPro",
     "slug": "pixel-warp-pro",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.yourname.pixelwarppro"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
-      },
-      "package": "com.yourname.pixelwarppro",
-      "permissions": [
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.CAMERA"
-      ]
-    },
+    "ios": { "bundleIdentifier": "com.yourname.pixelwarppro" },
+    "android": { "package": "com.yourname.pixelwarppro" },
     "plugins": [
-      "@shopify/react-native-skia",
+      [
+        "@shopify/react-native-skia",
+        {}
+      ],
       "expo-image-picker"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "your-project-id"
-      }
-    }
+    ]
   }
 }
