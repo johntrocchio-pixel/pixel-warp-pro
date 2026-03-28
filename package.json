@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "expo": "~50.0.0",
-    "expo-dev-client": "~3.3.11",
     "expo-image-picker": "~14.7.1",
     "expo-status-bar": "~1.11.1",
     "react": "18.2.0",
