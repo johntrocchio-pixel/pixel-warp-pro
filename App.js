@@ -15,7 +15,7 @@ export default function App() {
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1, 
+      quality: 1, // Crucial: Pulls the raw, uncompressed file
     });
 
     if (!result.canceled) {
@@ -28,7 +28,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>PIXEL MICROSCOPE SHARP</Text>
+        <Text style={styles.title}>PIXEL INSPECTOR PRO</Text>
       </View>
 
       <View style={styles.canvas}>
@@ -38,35 +38,35 @@ export default function App() {
             renderIndicator={() => null} 
             backgroundColor="#000"
             enablePinchZoom={true}
-            maxScale={500} // Extreme depth
+            maxScale={1000} // 1000x Zoom for deep manipulation inspection
             minScale={1}
             doubleClickConfigs={{
-              zoomFactor: 25, // Jump deep into pixels on double tap
+              zoomFactor: 50, // Instant jump to pixel-level on double-tap
             }}
-            // THIS SECTION KILLS THE BLUR
+            // --- THE PRECISION RENDERER ---
             renderImage={(props) => (
               <Image 
                 {...props} 
                 style={[props.style, { 
-                    // This is the specific Android fix for pixelated scaling
+                    // This kills the blur on high-end Androids
+                    interpolationMode: 'none',
                     renderToHardwareTextureAndroid: true,
                 }]} 
-                // Forces the OS to not smooth the image
-                resizeMethod="scale" 
+                resizeMethod="scale" // Forces hard-edge scaling
                 fadeDuration={0}
               />
             )}
           />
         ) : (
           <TouchableOpacity style={styles.placeholder} onPress={pickImage}>
-            <Text style={styles.placeholderText}>+ LOAD IMAGE</Text>
+            <Text style={styles.placeholderText}>+ LOAD ARTWORK</Text>
           </TouchableOpacity>
         )}
       </View>
 
       <View style={styles.footer}>
         <TouchableOpacity style={styles.button} onPress={pickImage}>
-          <Text style={styles.buttonText}>{image ? "NEW IMAGE" : "OPEN GALLERY"}</Text>
+          <Text style={styles.buttonText}>{image ? "RELOAD IMAGE" : "OPEN GALLERY"}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -78,21 +78,21 @@ const styles = StyleSheet.create({
   header: { 
     paddingTop: 50, 
     alignItems: 'center', 
-    backgroundColor: '#111', 
+    backgroundColor: '#050505', 
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderColor: '#00ffcc33' 
+    borderColor: '#00ffcc' 
   },
-  title: { color: '#00ffcc', fontSize: 18, fontWeight: 'bold', letterSpacing: 4 },
+  title: { color: '#00ffcc', fontSize: 16, fontWeight: 'bold', letterSpacing: 5 },
   canvas: { flex: 1 },
   placeholder: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  placeholderText: { color: '#00ffcc', fontSize: 14, opacity: 0.5 },
-  footer: { backgroundColor: '#111', paddingBottom: 40, alignItems: 'center', paddingTop: 15 },
+  placeholderText: { color: '#00ffcc', fontSize: 14, opacity: 0.4 },
+  footer: { backgroundColor: '#050505', paddingBottom: 40, alignItems: 'center', paddingTop: 15 },
   button: { 
     backgroundColor: '#00ffcc', 
     paddingVertical: 15, 
-    paddingHorizontal: 50, 
-    borderRadius: 2 
+    paddingHorizontal: 60, 
+    borderRadius: 0 // Sharp corners for a technical look
   },
-  buttonText: { color: '#000', fontWeight: 'bold', letterSpacing: 1 },
+  buttonText: { color: '#000', fontWeight: 'bold', letterSpacing: 2 },
 });
