@@ -1,7 +1,7 @@
 {
   "name": "pixel-warp-pro",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "node_modules/expo/AppEntry.js", 
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -12,7 +12,6 @@
     "expo-dev-client": "~3.3.11",
     "expo-status-bar": "~1.11.1",
     "react": "18.2.0",
-    "react-native": "0.73.6",
-    "@shopify/react-native-skia": "0.1.221"
+    "react-native": "0.73.6"
   }
 }
