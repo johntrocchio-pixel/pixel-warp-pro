@@ -1,39 +1,37 @@
 import React from 'react';
-import { StyleSheet, View, Dimensions } from 'react-native';
-import { Canvas, Path, Skia, TouchHandler, useTouchHandler } from "@shopify/react-native-skia";
-
-const { width, height } = Dimensions.get("window");
+import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
-  const [paths, setPaths] = React.useState([]);
-
-  // The "Lasso" and "Paint" logic
-  const touchHandler = useTouchHandler({
-    onStart: ({ x, y }) => {
-      const newPath = Skia.Path.Make();
-      newPath.moveTo(x, y);
-      setPaths((prev) => [...prev, newPath]);
-    },
-    onActive: ({ x, y }) => {
-      const currentPath = paths[paths.length - 1];
-      if (currentPath) {
-        currentPath.lineTo(x, y);
-        setPaths([...paths]);
-      }
-    },
-  });
-
   return (
     <View style={styles.container}>
-      <Canvas style={styles.canvas} onTouch={touchHandler}>
-        {paths.map((p, i) => (
-          <Path 
-            key={i} 
-            path={p} 
-            color="#00ffcc" 
-            style="stroke" 
-            strokeWidth={5} 
-          />
+      <Text style={styles.title}>PIXEL WARP PRO</Text>
+      <Text style={styles.subtitle}>System Online</Text>
+      <StatusBar style="light" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    color: '#00ffcc',
+    fontSize: 32,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+  subtitle: {
+    color: '#ffffff',
+    fontSize: 16,
+    marginTop: 10,
+    opacity: 0.7,
+  },
+});
         ))}
       </Canvas>
     </View>
