@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image, ScrollView, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image, ScrollView, Alert, Dimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+
+const screen = Dimensions.get('window');
 
 export default function App() {
   const [image, setImage] = useState(null);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
     if (status !== 'granted') {
-      Alert.alert("Permission Denied", "We need access to your photos to zoom into them!");
+      Alert.alert("Permission Denied", "We need access to your photos!");
       return;
     }
 
@@ -31,13 +32,24 @@ export default function App() {
 
       <View style={styles.canvas}>
         {image ? (
-          <ScrollView 
-            maximumZoomScale={50} 
-            minimumZoomScale={1} 
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
+          <ScrollView
+            maximumZoomScale={100} // This allows for extreme 100x zoom
+            minimumZoomScale={1}
+            horizontal={true}
+            centerContent={true}
+            contentContainerStyle={styles.scrollContent}
           >
-            <Image source={{ uri: image }} style={styles.fullImage} resizeMode="contain" />
+            <ScrollView
+              maximumZoomScale={100}
+              minimumZoomScale={1}
+              centerContent={true}
+            >
+              <Image 
+                source={{ uri: image }} 
+                style={styles.fullImage} 
+                resizeMode="contain" 
+              />
+            </ScrollView>
           </ScrollView>
         ) : (
           <View style={styles.placeholder}>
@@ -57,8 +69,15 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   header: { paddingTop: 50, alignItems: 'center', backgroundColor: '#111', paddingBottom: 20 },
   title: { color: '#00ffcc', fontSize: 22, fontWeight: 'bold', letterSpacing: 2 },
-  canvas: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  fullImage: { width: 400, height: 400 },
+  canvas: { flex: 1 },
+  scrollContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fullImage: { 
+    width: screen.width, 
+    height: screen.width, // Keeps the aspect ratio square for the "slide"
+  },
   placeholder: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   placeholderText: { color: '#666', fontSize: 16 },
   button: { backgroundColor: '#00ffcc', padding: 20, marginHorizontal: 40, marginBottom: 40, borderRadius: 10, alignItems: 'center' },
