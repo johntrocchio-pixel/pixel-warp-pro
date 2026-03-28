@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image, ScrollView, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function App() {
   const [image, setImage] = useState(null);
 
   const pickImage = async () => {
-    // This part asks the phone for permission explicitly
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
+    if (status !== 'granted') {
+      Alert.alert("Permission Denied", "We need access to your photos to zoom into them!");
       return;
     }
 
@@ -32,12 +31,17 @@ export default function App() {
 
       <View style={styles.canvas}>
         {image ? (
-          <ScrollView maximumZoomScale={20} minimumZoomScale={1} centerContent={true}>
+          <ScrollView 
+            maximumZoomScale={50} 
+            minimumZoomScale={1} 
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+          >
             <Image source={{ uri: image }} style={styles.fullImage} resizeMode="contain" />
           </ScrollView>
         ) : (
           <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>TAP BELOW TO LOAD IMAGE</Text>
+            <Text style={styles.placeholderText}>TAP OPEN GALLERY TO BEGIN</Text>
           </View>
         )}
       </View>
@@ -51,12 +55,12 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-  header: { paddingTop: 40, alignItems: 'center', backgroundColor: '#111', paddingBottom: 15 },
-  title: { color: '#00ffcc', fontSize: 20, fontWeight: 'bold' },
-  canvas: { flex: 1 },
-  fullImage: { width: 400, height: 400 }, // Initial size before zoom
+  header: { paddingTop: 50, alignItems: 'center', backgroundColor: '#111', paddingBottom: 20 },
+  title: { color: '#00ffcc', fontSize: 22, fontWeight: 'bold', letterSpacing: 2 },
+  canvas: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  fullImage: { width: 400, height: 400 },
   placeholder: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  placeholderText: { color: '#444', fontWeight: 'bold' },
-  button: { backgroundColor: '#00ffcc', padding: 20, margin: 30, borderRadius: 8, alignItems: 'center' },
-  buttonText: { color: '#000', fontWeight: '900' },
+  placeholderText: { color: '#666', fontSize: 16 },
+  button: { backgroundColor: '#00ffcc', padding: 20, marginHorizontal: 40, marginBottom: 40, borderRadius: 10, alignItems: 'center' },
+  buttonText: { color: '#000', fontSize: 18, fontWeight: 'bold' },
 });
